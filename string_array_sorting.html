@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>String Array Sort</title>
+
+    <script>
+
+
+        function sortArray(){
+
+            var originalArray = ["ABC", "AA", "BADA","BADARAE", "BAD",  "CARD"];
+            var copyArray = originalArray;
+
+            for (let index = 0; index < originalArray.length; index++) {
+                var element = originalArray[index];
+                originalArray.sort(element, originalArray[index+1]);
+            }
+            document.getElementById('sortedArray').innerText = "Sorted Array : ".concat(originalArray);
+        }
+
+
+    </script>
+
+</head>
+<body>
+    
+    <label id="originalArray">Original Array : ["ABC", "AA", "BADA", "BADARAE", "BAD", "CARD"] </label>
+    <br>
+    <br>
+    <br>
+    <label id="sortedArray">Sorted Array : </label>
+
+    <br>
+    <br>
+    <input type="button" value="Sort Array" onclick="{sortArray()}"/>
+
+
+</body>
+</html>

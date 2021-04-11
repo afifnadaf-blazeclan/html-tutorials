@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Format</title>
+
+    <script>
+        function formatDate(){
+            
+            var monthsArray = ['Jan','Feb','Mar','Apr','May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var daysArray = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+            var dateString = document.getElementById('dateValue').value;
+            var dateValuesList = dateString.split('-');
+
+            var dateValue = new Date(dateValuesList[2],dateValuesList[1],dateValuesList[0]);
+
+            var formatedString = daysArray[dateValue.getDay()];
+
+            formatedString = formatedString.concat(", " + dateValue.getDate() + " " + monthsArray[dateValue.getMonth()] + ", " + dateValue.getFullYear());
+
+            console.log(formatedString);
+
+        }
+    </script>
+
+</head>
+<body>
+
+    <input type="text" id="dateValue"/>
+
+    <br>
+    <br>
+    <br>
+
+    <input type="button" value="Format Date" onclick="{formatDate()}" />
+
+    <br>
+    <br>
+
+    <label id="resultField"></label>
+
+</body>
+</html>

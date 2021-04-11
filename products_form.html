@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+
+    <script src="./scripts/validators.js"></script>
+    <script src="../jstrg/uis/uis.js"></script>
+
+    <script>    
+
+        var validators;
+
+        window.onload = function(){
+            
+            var categories = ['ECT','ECL','FOD-FAST','FOD-DRK'];
+            var manufacturer = ['HP','IBM','TATA','BAJAJ','PARLE'];
+
+            var dynamicUI = new generateUI();
+            
+            validators = new FormValidator();
+            
+            document.getElementById('productId').addEventListener('change', function(){
+                
+            }, false);
+
+            document.getElementById('categoryOptions').innerHTML = dynamicUI.select(categories);
+
+            document.getElementById('manufacturerOptions').innerHTML = dynamicUI.select(manufacturer);
+
+        }
+
+    </script>
+
+</head>
+<body>
+    
+    <div>
+
+        <table>
+
+            <tr>
+                <td> <label>Product Id </label> </td>
+                 <td><input type="text" id="productId"></td>
+            </tr>
+
+
+            <tr>
+                <td>
+                <label>Product Name </label> </td>
+                <td> <input type="text" id="productName"></td>
+            </tr>
+
+            <tr>
+                <td>Category Name </td>
+                <td><select id="categoryOptions"></select></td>
+            </tr>
+
+            <tr>
+                <td>Manufacturer</td>
+                <td><select id="manufacturerOptions"></select></td>
+            </tr>
+
+            <tr>
+                <td>Description</td>
+                <td><input type="text" id="productDescription"></td>
+            </tr>
+
+            <tr>
+                <td>Price</td>
+                <td><input type="text" id="productPrice"></td>
+            </tr>
+
+            <tr>
+                <td><input type="button" value="Add Product"></td>
+            </tr>
+
+        </table>
+    </div>
+
+</body>
+</html>

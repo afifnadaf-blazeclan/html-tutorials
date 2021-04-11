@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Succession Array</title>
+
+    <script>
+
+        function calculatePowerValues(){
+            var arrayString = document.getElementById('arrayInput').value;
+            var numbersList = arrayString.split(",");
+            var resultNumbers = [numbersList.length];
+            for (let index = 0; index < numbersList.length-1; index++) {
+                var element = numbersList[index];
+                var result = Math.pow(element, numbersList[index+1]);
+                resultNumbers[index] = result;
+            }
+
+            document.getElementById('resultLabel').innerText = resultNumbers;
+        }
+
+    </script>
+
+
+</head>
+<body>
+    <input type="text" id="arrayInput" />
+
+    <br>
+    <br>
+    <br>
+    
+    <input type="button" value="Calculate" onclick="{calculatePowerValues()}" />
+
+    <br>
+    <br>
+    <br>
+
+    <label id="resultLabel"> Calculating .....</label>
+
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>String Ops</title>
+    <script>
+         var paragraph = 'The James Bond series focuses on a fictional British Secret Service agent created in 1953 by writer Ian Fleming, who featured him in twelve novels and two short-story collections. Since Fleming\'s death in 1964, eight other authors have written authorised Bond novels or novelisations: Kingsley Amis, Christopher Wood, John Gardner, Raymond Benson, Sebastian Faulks, Jeffery Deaver, William Boyd and Anthony Horowitz. The latest novel is Forever and a Day by Anthony Horowitz, published in May 2018. Additionally Charlie Higson wrote a series on a young James Bond, and Kate Westbrook wrote three novels based on the diaries of a recurring series character, The character—also known by the code number 007 (pronounced \"double-O-seven\")—has also been adapted for television, radio, comic strip, video games and film. The films are the longest continually running film series of all time and have grossed over US$7.04 billion in total, making it the sixth-highest-grossing film series to date, which started in 1962 with Dr. No, starring Sean Connery as Bond. As of 2021, there have been twenty-four films in the Eon Productions series. The most recent Bond film, Spectre (2015), stars Daniel Craig in his fourth portrayal of Bond; he is the sixth actor to play Bond in the Eon series. There have also been two independent productions of Bond films: Casino Royale (a 1967 spoof starring David Niven) and Never Say Never Again (a 1983 remake of an earlier Eon-produced film, 1965\'s Thunderball, both starring Connery). In 2015 the series was estimated to be worth $19.9 billion,[1] making James Bond one of the highest-grossing media franchises of all time.';
+
+
+        function showUpperCase(){
+
+            var newPara  = "";
+            var wordsList = paragraph.split(" ");
+            
+            for(var i= 0; i < wordsList.length; i++){
+                var word = wordsList[i];
+                newPara = newPara.concat(word.substring(0,1).toUpperCase().concat(word.substring(1, word.length)) + " " )
+            }
+            document.getElementById('uppercase').innerText = newPara;
+        }
+
+        function reverseWords(){
+            
+            var newPara  = "";
+            var wordsList = paragraph.split(" ");
+            
+            for(var i= 0; i < wordsList.length; i++){
+                var word = wordsList[i];
+                var newWord = "";
+
+                for (var index = word.length; index >= 0; index--) {
+                    if (word.charAt(index).match(/[a-zA-z]/)) {
+                        newWord = newWord.concat(word.charAt(index));  
+                    }
+                }
+                if (!word.charAt(word.length-1).match(/[a-zA-z]/)) {
+                    newWord = newWord.concat(word.charAt(word.length-1));
+                }
+                newPara = newPara.concat(newWord + " ")
+            }
+            document.getElementById('reversePara').innerText = newPara;
+        }
+
+        function searchString(){
+            var searchKey = document.getElementById('searchBox').value.toString();
+            console.log(searchKey);
+            var indices = "";
+            var wordsList = paragraph.split(" ");
+            for (let index = 0; index < wordsList.length; index++) {
+                var element = wordsList[index];
+                if (element.toLowerCase() == searchKey.toLowerCase()) {
+                    indices = indices.concat(index + ", ");
+                }
+            }
+            var searchCount = indices.split(",");
+            document.getElementById("searchCountLabel").innerText = "Search Count : " + (searchCount.length-1) + "\n" + indices;
+        }
+
+        function numberOfStatememts(){
+            var statmentCount = paragraph.split('.')
+            document.getElementById('statementCountLabel').innerText = statmentCount.length;
+        }
+
+        function findVowels(){
+            var vowelsCount = 0;
+            var vowelsIndexs = "";
+
+            for(var i= 0; i < paragraph.length; i++){
+                var character = paragraph.charAt(i).toLowerCase();
+                if (character.match(/[aeuio]/)){
+                    vowelsCount++;
+                    vowelsIndexs = vowelsIndexs.concat(i + ",")
+                }
+            }
+            document.getElementById('vowelsCountLabel').innerText = vowelsCount + " and at indexs " + vowelsIndexs;
+        }
+
+        function findNumbers(){
+            var numbersList = "";
+            var wordsList = paragraph.split(" ");
+            for(var i= 0; i < wordsList.length; i++){
+                var word = wordsList[i];
+                if (word.match(/[0-9]/)){
+                   numbersList = numbersList.concat(word + ",");
+                }
+            }
+            document.getElementById('numbersList').innerText = numbersList;
+        }
+   
+    </script>
+</head>
+<body>
+
+    <div>
+
+        <p id="para1"> The James Bond series focuses on a fictional British Secret Service agent created in 1953 by writer Ian Fleming, who featured him in twelve novels and two short-story collections. Since Fleming\'s death in 1964, eight other authors have written authorised Bond novels or novelisations: Kingsley Amis, Christopher Wood, John Gardner, Raymond Benson, Sebastian Faulks, Jeffery Deaver, William Boyd and Anthony Horowitz. The latest novel is Forever and a Day by Anthony Horowitz, published in May 2018. Additionally Charlie Higson wrote a series on a young James Bond, and Kate Westbrook wrote three novels based on the diaries of a recurring series character,
+        
+         <br> <br> The character—also known by the code number 007 (pronounced \"double-O-seven\")—has also been adapted for television, radio, comic strip, video games and film. The films are the longest continually running film series of all time and have grossed over US$7.04 billion in total, making it the sixth-highest-grossing film series to date, which started in 1962 with Dr. No, starring Sean Connery as Bond. As of 2021, there have been twenty-four films in the Eon Productions series. The most recent Bond film, Spectre (2015), stars Daniel Craig in his fourth portrayal of Bond; he is the sixth actor to play Bond in the Eon series. There have also been two independent productions of Bond films: Casino Royale (a 1967 spoof starring David Niven) and Never Say Never Again (a 1983 remake of an earlier Eon-produced film, 1965\'s Thunderball, both starring Connery). In 2015 the series was estimated to be worth $19.9 billion,[1] making James Bond one of the highest-grossing media franchises of all time.    </p>
+
+    </div>
+
+
+    <input type="text" id="searchBox" />
+    <input type="button" value="Count" id="count" onclick="{searchString()}"/><br>
+    <label id="searchCountLabel">0</label>
+    <br><br>
+    
+    <input type="button" value="Show Vowels" id="vowelsCounts" onclick="{findVowels()}"><br>
+    <label id="vowelsCountLabel"> 0 </label>
+    <br><br>
+    
+    <input type="button" value="Statements" id="statementCounts" onclick="{numberOfStatememts()}"><br>
+    <label id="statementCountLabel">0</label>
+    <br><br>
+
+    <input type="button" value="Upper Case" id="titleCase" onclick="{showUpperCase()}"><br>
+    <label id="uppercase"></label>
+    <br><br>
+
+    <input type="button" value="Reverse Words" id="reverseWords" onclick="{reverseWords()}"><br>
+    <label id="reversePara"></label>
+
+    <br><br>
+    
+    <input type="button" value="Show Numbers" id="showNumbers" onclick="{findNumbers()}"><br>
+    <label id="numbersList"></label>
+
+
+</body>
+</html>

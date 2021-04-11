@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script>
+        function displayNumber(value){
+            var resultArea = document.getElementById("resultArea");
+            var initialValue = resultArea.value;
+            if (parseInt(initialValue) == 0) {
+                resultArea.innerText = value;
+            } else {
+                resultArea.innerText = initialValue + value;                
+            }
+            console.log(initialValue + value);
+        }
+
+        function calculateResult(){
+            var resultArea = document.getElementById("resultArea");
+            var value = resultArea.value;
+
+            console.log("Inner text : " + value);
+            var finalExpression = String(value);
+            if (finalExpression.includes('+')) {
+                startAddition(finalExpression);
+            } else if(finalExpression.includes('-')){
+                startSubtraction(finalExpression);
+            } else if (finalExpression.includes('x')){
+                startMultiplication(finalExpression);
+            }else if(finalExpression.includes('/')){
+                startDividation(finalExpression);
+            }else if(finalExpression.includes('%')){
+                startModelOperation(finalExpression);
+            }
+        }
+
+        function startAddition(value) {
+            var resultArea = document.getElementById("resultArea");
+            var expression = String(value);
+            var operands =  expression.split('+');
+            var finalResult = parseFloat(operands[0]) + parseFloat(operands[1]);
+            resultArea.innerText = finalResult;
+        }
+
+        function startSubtraction(value) {
+            var resultArea = document.getElementById("resultArea");
+            var expression = String(value);
+            var operands =  expression.split('-');
+            var finalResult = parseFloat(operands[0]) - parseFloat(operands[1]);
+            resultArea.innerText = finalResult;
+        }
+
+        function startMultiplication(value) {
+            var resultArea = document.getElementById("resultArea");
+            var expression = String(value);
+            var operands =  expression.split('x');
+            var finalResult = parseFloat(operands[0]) * parseFloat(operands[1]);
+            resultArea.innerText = finalResult;
+        }
+
+        function startDividation(value) {
+            var resultArea = document.getElementById("resultArea");
+            var expression = String(value);
+            var operands =  expression.split('/');
+            var finalResult = parseFloat(operands[0]) / parseFloat(operands[1]);
+            resultArea.innerText = finalResult;
+        }
+
+        function startModelOperation(value) {
+            var resultArea = document.getElementById("resultArea");
+            var expression = String(value);
+            var operands =  expression.split('%');
+            var finalResult = parseFloat(operands[0]) % parseFloat(operands[1]);
+            resultArea.innerText = finalResult;
+        }
+        
+        function clearData(){
+            var resultArea = document.getElementById("resultArea");
+            resultArea.innerText = "0";
+        }
+
+
+    </script>
+    
+    <title>Calculator</title>
+
+</head>
+<body>
+
+        <textarea id="resultArea" style="width: 210px;"></textarea>
+        <table>
+        <tr>
+        <td colspan="2"><input type="button" style="width: 105px; background-color:grey; color: white;" value="AC" onclick="{clearData()}"></td>
+        <td><input type="button" style="width: 50px; background-color:grey; color: white;" value="%" onclick="{displayNumber(value)}"></td>
+        <td><input type="button" style="width: 50px;  background-color: coral; color: white;" value="/" onclick="{displayNumber(value)}"></td>
+        </tr>
+        <tr>
+        <td ><input type="button" value="7" style="width: 50px; background-color:darkgrey; color: white;" onclick="{displayNumber(value)}"></td>
+            <td><input type="button" value="8" style="width: 50px; background-color:darkgrey; color: white;" onclick="{displayNumber(value)}"></td>
+            <td><input type="button" style="width: 50px; background-color:darkgrey; color: white;" value="9" onclick="{displayNumber(value)}"></td>
+            <td><input type="button" style="width: 50px; background-color: coral; color: white;" value="x" onclick="{displayNumber(value)}"></td>
+        </tr>
+
+        <td ><input type="button" value="4" style="width: 50px; background-color:darkgrey; color: white;" onclick="{displayNumber(value)}"></td>
+            <td><input type="button" value="5" style="width: 50px; background-color:darkgrey; color: white;" onclick="{displayNumber(value)}"></td>
+            <td><input type="button" style="width: 50px; background-color:darkgrey; color: white;" value="6" onclick="{displayNumber(value)}"></td>
+            <td><input type="button" style="width: 50px; background-color: coral; color: white;" value="-" onclick="{displayNumber(value)}"></td>
+        </tr>
+
+        <td ><input type="button" value="1" style="width: 50px; background-color:darkgrey; color: white;" onclick="{displayNumber(value)}"></td>
+        <td><input type="button" value="2" style="width: 50px; background-color:darkgrey; color: white;" onclick="{displayNumber(value)}"></td>
+        <td><input type="button" style="width: 50px; background-color:darkgrey; color: white;" value="3" onclick="{displayNumber(value)}"></td>
+        <td><input type="button" style="width: 50px; background-color: coral; color: white;" value="+" onclick="{displayNumber(value)}"></td>
+    </tr>
+
+    <tr>
+        <td colspan="2"><input type="button" style="width: 105px; background-color:darkgrey; color: white;" value="0" onclick="{displayNumber(value)}"></td>
+        <td><input type="button" style="width: 50px; background-color:darkgrey; color: white;" value="." onclick="{displayNumber(value)}"></td>
+        <td><input type="button" style="width: 50px;  background-color: coral; color: white;" value="=" onclick="{calculateResult()}"></td>
+    </tr>
+        
+    </table>
+
+
+</body>
+</html>

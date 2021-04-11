@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+
+    <script src="./scripts/validators.js"></script>
+    <script src="../uis/uis.js"></script>
+    <script src="./scripts/local_storage.js"></script>
+    <script src="./scripts/indexed_db.js"></script>
+
+    <script>   
+    
+        var validators;
+
+        var product = {
+            id : "",
+            name : "",
+            categoryName : "",
+            manufacturerName : "",
+            description : "",
+            price : ""
+        };
+
+        var cart = {
+            cart_id: "",
+            id : "",
+            name: "",
+            category: "",
+            manufacturer : "",
+            description : "",
+            price : ""
+        };
+
+
+        var bill = {
+            bill_id : "",
+            product_ids : "",
+            bill_total: "",
+            orderedOn : ""
+        };
+
+        var productsLogic;   
+        var dynamicUI; 
+        var indexedLogic;
+        var cartProducts = [];
+
+        window.onload = function(){
+            
+            var categories = ['ECT','ECL','FOD-FAST','FOD-DRK'];
+            var manufacturer = ['HP','IBM','TATA','BAJAJ','PARLE'];
+
+            dynamicUI = new generateUI();
+            productsLogic = new ProductsLogic();
+            validators = new FormValidator();
+            indexedLogic = new IndexedDBLogic();
+
+            loadStorageContent();
+             
+            document.getElementById('categoryOptions').innerHTML = dynamicUI.radio(categories, "categories");
+
+            document.getElementById('manufacturerOptions').innerHTML = dynamicUI.radio(manufacturer, "manufacturer");
+            
+            document.getElementById('productId').addEventListener('change', function(){
+                
+            }, false);
+            
+            document.getElementById('addProduct').addEventListener('click', function(){
+                product.name = document.getElementById('productName').value;
+                product.id = document.getElementById('productId').value;
+                product.description = document.getElementById('productDescription').value;
+                product.price = document.getElementById('productPrice').value;
+                productsLogic.addNewProduct(product);
+                loadStorageContent();
+            }, false); 
+
+            indexedLogic.createDatabase();
+
+            var tableRows = document.getElementsByTagName('tr');
+
+            for (let index = 0; index < tableRows.length; index++) {
+                const element = tableRows[index];
+                element.addEventListener('dragstart', function(event){
+                    event.dataTransfer.setData('text', event.target.id);
+                }, false) ;               
+            }
+
+
+
+            var cartTable = document.getElementById('cartTable');
+            var billTable = document.getElementById('billTable');
+
+            cartTable.innerHTML = dynamicUI.tableHeader(cart);
+            billTable.innerHTML = dynamicUI.tableHeader(bill);
+
+            cartTable.addEventListener('drop', function(event){
+                event.preventDefault();
+                var element = event.dataTransfer.getData('text');
+                console.log('element id', element);
+                
+                var product = productsLogic.getProductDetailsById(element);
+                addCartItem(product);
+            }, false);
+
+            cartTable.addEventListener('dragover', function(event){
+                event.preventDefault();
+            }, false);
+
+            
+            generateCartTable();
+            generateBillTable();
+            calculateCartTotal();
+
+        };
+
+
+        function addCartItem(product){
+
+            var myDatabase = window.indexedDB.open('ShoppingMart');
+            var cartid = indexedLogic.generateUniqueKey("CART");
+            if (myDatabase) {
+                
+                myDatabase.onsuccess = function(e){
+                    var transaction = e.target.result.transaction('cart','readwrite');
+                    var cartTable = transaction.objectStore('cart');
+
+                    var cartObject =  {
+                        "cart_id" : cartid,
+                        "id" : product.id,
+                        "name" : product.name,
+                        "category" : product.categoryName,
+                        "manufacturer" : product.manufacturerName,
+                        "description" : product.description,
+                        "price" : product.price
+                    };
+
+                    var saveCartItem = cartTable.add(cartObject)
+
+                    saveCartItem.onsuccess = function(e){
+                        document.getElementById('cartStatus').innerText = "Product added in cart successfully."
+                        var node = document.createElement('tr')
+                        node.innerHTML = dynamicUI.generateTableRow(cartObject);
+                        document.getElementById('cartTable').appendChild(node);
+
+                        calculateCartTotal();
+                    };
+
+                    saveCartItem.onerror = function(e){
+                        document.getElementById('cartStatus').innerText = "Not able to add product in cart."
+                    }  
+                
+                }
+
+            }else{
+                document.getElementById('cartStatus').innerText = 'Error in Save Operation, may be database is not open';
+            }
+
+        };
+
+        var cartTotal = 0;
+
+        function calculateCartTotal(){
+            var myDatabase = window.indexedDB.open('ShoppingMart');
+
+            if(myDatabase){
+                myDatabase.onsuccess = function(e){
+                    var transaction = e.target.result.transaction('cart','readwrite');
+                    var cartTable = transaction.objectStore('cart');
+                    var reader = cartTable.openCursor();
+
+
+                    reader.onsuccess = function(cartItems){
+                        var readCursor = cartItems.target.result;
+                        if (readCursor) {
+                            console.log("Calculate total : " + JSON.parse(JSON.stringify(readCursor.value)).price);
+                            cartTotal += parseInt(JSON.parse(JSON.stringify(readCursor.value)).price);
+                            document.getElementById('cartTotalAmount').innerHTML = "Order Total : <strong> INR " + cartTotal +"</strong>"; 
+                            readCursor.continue();                           
+                        }
+                    }
+
+                    reader.onerror = function(error){
+                        document.getElementById('cartStatus').innerText = 'Error while fetching cart data.';
+                    }
+                };
+
+                myDatabase.onerror = function(e){
+                    document.getElementById('cartStatus').innerText = 'Error while fetching cart data.';
+                };
+            }
+        }
+
+        var cartProducts = [];
+
+        function generateCartTable(){
+            
+            var cartsTableElement = document.getElementById('cartTable')
+            var myDatabase = window.indexedDB.open('ShoppingMart');
+
+            if(myDatabase){
+                myDatabase.onsuccess = function(e){
+                    var transaction = e.target.result.transaction('cart','readwrite');
+                    var cartTable = transaction.objectStore('cart');
+                    var reader = cartTable.openCursor();
+
+
+                    reader.onsuccess = function(cartItems){
+                        var readCursor = cartItems.target.result;
+                        if (readCursor) {
+                            cartProducts.push(readCursor.value);
+                            var node = document.createElement('tr')
+                            node.innerHTML = dynamicUI.generateTableRow(readCursor.value)
+                            document.getElementById('cartTable').appendChild(node);
+                            readCursor.continue();
+                        }
+                        console.log("Cart Item : " + JSON.stringify(cartProducts))
+                    }
+
+                    reader.onerror = function(error){
+                        document.getElementById('cartStatus').innerText = 'Error while fetching cart data.';
+                    }
+                };
+
+                myDatabase.onerror = function(e){
+                    document.getElementById('cartStatus').innerText = 'Error while fetching cart data.';
+                };
+            }
+        }
+
+        function loadStorageContent(){
+            var dataSource = [];
+            var keysList = Object.keys(localStorage);
+
+            console.log('local storage data ' + localStorage);
+
+            for (let index = 0; index < keysList.length; index++) {
+                const element = keysList[index];
+                console.log("Product Id", element);
+                dataSource.push(localStorage.getItem(element));
+            }
+            console.log('Products Array : ' + dataSource);
+            document.getElementById('productsTable').innerHTML = dynamicUI.table(dataSource);
+        };
+
+        function handleClick(element){
+            if (element.name == "categories") {
+                product.categoryName = element.value;
+                console.log('Categories', element.value);
+            }else{
+                product.manufacturerName = element.value;
+                console.log('Manufacturer', element.value);
+            }
+        };
+
+        function clearLocalStorage(){
+            localStorage.clear();
+        };
+
+        function placeOrder(){
+            if (cartProducts.length > 0) {
+                var billTableElement = document.getElementById('billTable')
+                var myDatabase = window.indexedDB.open('ShoppingMart');
+                var bill_id = indexedLogic.generateUniqueKey("BILL-");
+
+                var product_ids = getProductIds(cartProducts);
+
+                if (myDatabase) {
+
+                    myDatabase.onsuccess = function(e){
+                        var transaction = e.target.result.transaction('bill','readwrite');
+                        var billTable = transaction.objectStore('bill');
+
+                        var billStoreObject = {
+                            "bill_id" : bill_id,
+                            "product_ids": product_ids,
+                            "bill_total":  cartTotal,
+                            "orderedOn": Date.now()
+                        };
+
+                        var saveBillItem = billTable.add(billStoreObject)
+
+                        saveBillItem.onsuccess = function(e){
+                            document.getElementById('billStatus').innerText = "Order placed successfully."
+                            var node = document.createElement('tr')
+                            node.innerHTML = dynamicUI.generateTableRow(billStoreObject);
+                            billTableElement.appendChild(node);
+
+                            clearCartTable();
+                        };
+
+                        saveBillItem.onerror = function(e){
+                            document.getElementById('billStatus').innerText = "Unable to place order."
+                        }  
+
+                    }
+
+                    myDatabase.onerror = function(e){
+                        document.getElementById('billStatus').innerText = "Unable to place order."
+                    }
+
+                }
+            }
+        }
+
+        function clearCartTable(){
+            var myDatabase = window.indexedDB.open('ShoppingMart');
+            if (myDatabase) {
+                myDatabase.onsuccess = function(e){
+                    var transaction = e.target.result.transaction('cart', 'readwrite');
+                    var cartObjectStore = transaction.objectStore('cart');
+                    cartObjectStore.clear();
+
+                    cartObjectStore.onsuccess = function(e){
+                        document.getElementById('cartStatus').innerText = 'Cart Table cleared.';
+                    }
+                }
+            }
+        }
+
+        var billItems = [];
+
+        function generateBillTable(){
+            
+            var billTableElement = document.getElementById('billTable')
+            var myDatabase = window.indexedDB.open('ShoppingMart');
+
+            if(myDatabase){
+                myDatabase.onsuccess = function(e){
+                    var transaction = e.target.result.transaction('bill','readwrite');
+                    var billTable = transaction.objectStore('bill');
+                    var reader = billTable.openCursor();
+
+
+                    reader.onsuccess = function(cartItems){
+                        var readCursor = cartItems.target.result;
+                        if (readCursor) {
+                            billItems.push(readCursor.value);
+                            var node = document.createElement('tr')
+                            node.innerHTML = dynamicUI.generateTableRow(readCursor.value)
+                            billTableElement.appendChild(node);
+                            readCursor.continue();
+                        }
+                        console.log("Bill Item : " + JSON.stringify(billItems))
+                    }
+
+                    reader.onerror = function(error){
+                        document.getElementById('cartStatus').innerText = 'Error while fetching cart data.';
+                    }
+                };
+
+                myDatabase.onerror = function(e){
+                    document.getElementById('cartStatus').innerText = 'Error while fetching cart data.';
+                };
+            }
+        }
+
+
+        function getProductIds(dataSource){
+            var productIds = "";
+            for (let index = 0; index < dataSource.length; index++) {
+                const element = dataSource[index];
+                productIds += element.id + ", ";
+            }
+            return productIds
+        }
+
+    </script>
+
+</head>
+<body>
+
+    <div style="padding: 10px;">
+        <table>
+
+    
+            <tr>
+                <td style="padding: 10px;" > <label>Product Id </label> </td>
+                <td style="padding: 10px;"><input type="text" id="productId"></td>
+            </tr>
+
+            <tr>
+                <td style="padding: 10px;">
+                <label>Product Name </label> </td>
+                <td style="padding: 10px;"> <input type="text" id="productName"></td>
+            </tr>
+
+            <tr>
+                <td style="padding: 10px;">Category Name </td>
+                <td  style="padding: 10px;" id="categoryOptions"></td>
+            </tr>
+
+            <tr>
+                <td style="padding: 10px;">Manufacturer</td>
+                <td  style="padding: 10px;" id="manufacturerOptions"></td>
+            </tr>
+
+            <tr>
+                <td style="padding: 10px;">Description</td>
+                <td style="padding: 10px;"><input type="text" id="productDescription"></td>
+            </tr>
+
+            <tr>
+                <td style="padding: 10px;">Price</td>
+                <td style="padding: 10px;"><input type="text" id="productPrice"></td>
+            </tr>
+
+          
+        </table>
+        <br>
+        <td style="padding: 10px;"><input type="button" id="addProduct" value="Add Product"></td>
+        <td style="padding: 10px;"><input type="button" id="clear" value="Clear All" onclick="{clearLocalStorage()}"></td>
+        <td style="padding: 10px;"><input type="button" value="Load Data" onclick="{loadStorageContent()}"></td>
+
+    </div>
+
+    </div>
+
+    <br>
+    <br>    
+    <hr>
+    <br>
+    <label id="dbStatus"></label>
+    <br>
+    <br>
+    <div id="productsTable">
+
+    </div>
+    <br>
+    <hr>
+    <label> Cart Products :</label>
+    <br>
+    <br>
+    <label id="cartStatus"></label>
+    <br>
+    <br>
+
+    <div >
+        <table id="cartTable" style="border: solid; background-color: aqua; width: min-content;">
+        </table>
+     </div>
+
+     <br>
+     <br>
+     <label id="cartTotalAmount"></label>
+
+     <br><br>
+
+     <hr>
+     <br><br>
+
+    <input style="height: 50px; width: 200px; color: white; background-color: green;" type="button" value="Place Order" onclick="{placeOrder()}">
+
+    <br><br>
+
+    <label id="billStatus"></label>
+
+    <br><br>
+    <hr>
+    <br><br>
+
+    <div  id="billTable"  style="border: solid; background-color: greenyellow; width: min-content;">
+
+    </div>
+
+    <div style="height: 400px;"></div>
+
+
+     
+
+</body>
+</html>
