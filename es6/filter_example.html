@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ES6 - First Hands On lab</title>
+    <script src="./builds/employee_logic_build.js"></script>
+</head>
+<body>
+    
+    <table>
+
+        <td style="padding: 10px;">
+            <input type="button" value="Load Products" onclick="{loadAllProducts()}">
+        </td>
+
+        <td style="padding: 10px;">
+            <input type="button" value="Remove Duplicates" onclick="{removeDuplicates()}">
+        </td>
+
+
+        <tr>
+            <td style="padding: 10px;">
+                <input type="text" id="searchKey" value="" onchange="{searchDataBasedOnKey()}" > 
+            </td>
+            <td style="padding: 10px;">            
+                <input type="button" value="Search Key" onclick="{searchDataBasedOnKey()}">
+            </td>
+        </tr>
+
+
+        <tr>
+            <td style="padding: 10px;">
+                <label > Group By</label>
+            </td>
+            <td style="padding: 10px;">
+                <select name="group_by" id="groupBy" onchange="{onGroupBySelectionChanged(value)}">
+                   <option value="manufacturer">Manufacturer</option>
+                   <option value="categoryName">Category</option>
+                </select>
+            </td>
+        </tr>
+    
+    </table>
+
+    <br>
+    <label id="searchResult" style="color: red; font-size: 15px; padding: 10px;"></label>
+
+
+    <br><br>
+    <hr>
+    <br><br>
+    <div id="productsTable">
+
+    </div>
+
+</body>
+</html>
