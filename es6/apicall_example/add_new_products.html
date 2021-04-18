@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./scripts/valid_data.js"></script>
+    <script src="./scripts/ui_generator.js"></script>
+    <script src="./scripts/data_repository.js"></script>
+
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+
+    <style>
+        .thead-fixed{
+            position: -webkit-sticky;
+            position: sticky;
+            left: 0;
+            z-index: 2;
+        }
+
+        th {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+
+    </style>
+
+    <script>
+
+        var dataRepository;
+        var tableData;
+        var validateProduct;
+
+        window.onload = function(){
+            onPageLoaded();
+            dataRepository = new DataRepository();
+            loadProducts();
+        };
+        
+        function loadProducts(){
+            dataRepository.getProducts().then((response) => {
+                console.log(`Response JSON : ${response}`);  
+                return response.json();
+            }).then((data) => {
+                console.log(`Response data : ${JSON.stringify(data)}`);
+                tableData = data;
+                data.sort((first,second) => first.ProductRowId > second.ProductRowId);
+                loadTable(data, 'productsTable');
+            }).catch((error) => {
+                console.log('Error while fetching data');
+            });
+        }
+
+    
+
+        function productSaveClicked(){
+
+            let productsData = {
+                ProductId : "",
+                ProductName : "",
+                ProductRowId : 0,
+                BasePrice:0,
+                CategoryName: "",
+                Manufacturer : "",
+                Description: "" 
+            }
+            
+            productsData.ProductId = document.getElementById('productId').value;
+            productsData.ProductName = document.getElementById('productName').value;
+            productsData.Description = document.getElementById('description').value;
+            productsData.BasePrice = parseInt(document.getElementById('productPrice').value);
+            productsData.CategoryName = document.getElementById('categories').value;
+            productsData.Manufacturer = document.getElementById('manufacturer').value;
+            productsData.ProductRowId = getNewRowId(tableData);
+
+                      
+            var validData = validateData(productsData);
+            
+            console.log(`Product data is valid : ${validData}`);
+
+            if (validData) {
+                dataRepository.addNewProduct(productsData).then((response) => {
+                    console.log(`Response JSON : ${response}`);  
+                    return response.json();
+                }).then((data) => {
+                    console.log(`Response data : ${JSON.stringify(data)}`);
+                    loadProducts();
+                    document.getElementById('successMessageLabel').innerText = `New product with ID : ${productsData.ProductRowId} is been added successfully.`;
+                }).catch((error) => {
+                    console.log('Error while fetching data');
+                });
+            }            
+        }
+
+        function onEditClicked(id){
+           
+            console.log(`Edit id : ${id}`);
+            var prdInfo = tableData.find((element, index) => element.ProductRowId === parseInt(id));
+            console.log(`Element with ${id} : ${JSON.stringify(prdInfo)}`);
+            
+            document.getElementById('productId').value = prdInfo.ProductId;
+            document.getElementById('productName').value = prdInfo.ProductName;
+            document.getElementById('description').value = prdInfo.Description;
+            document.getElementById('productPrice').value = prdInfo.BasePrice;
+            document.getElementById('categories').value = prdInfo.CategoryName;
+            document.getElementById('manufacturer').value = prdInfo.Manufacturer;
+
+            document.getElementById('productUpdate').name = prdInfo.ProductRowId;
+
+        }
+
+        function onDeleteClicked(id){
+            console.log(`Delete id : ${id}`);
+
+            dataRepository.deleteProduct(id).then((response) => {
+                    console.log(`Update Response JSON : ${response}`);  
+                    return response.json();
+                }).then((data) => {
+                    console.log(`Update Response data : ${JSON.stringify(data)}`);
+                    loadProducts();
+                }).catch((error) => {
+                    console.log('Error while fetching data');
+            });
+        }
+
+        function productUpdateClicked(){
+
+            console.log(`${document.getElementById('productUpdate').name}`);
+            
+            let productsData = {
+                ProductId : "",
+                ProductName : "",
+                ProductRowId : 0,
+                BasePrice:0,
+                CategoryName: "",
+                Manufacturer : "",
+                Description: "" 
+            }
+            
+            productsData.ProductId = document.getElementById('productId').value;
+            productsData.ProductName = document.getElementById('productName').value;
+            productsData.Description = document.getElementById('description').value;
+            productsData.BasePrice = parseInt(document.getElementById('productPrice').value);
+            productsData.CategoryName = document.getElementById('categories').value;
+            productsData.Manufacturer = document.getElementById('manufacturer').value;
+            productsData.ProductRowId = parseInt(document.getElementById('productUpdate').name);
+
+            var validData = validateData(productsData);
+            
+            console.log(`Product data is valid : ${validData}`);
+
+            if (validData) {
+                dataRepository.updateProduct(productsData, productsData.ProductRowId).then((response) => {
+                    console.log(`Update Response JSON : ${response}`);  
+                    document.getElementById('successMessageLabel').innerText = `Product with ID : ${productsData.ProductRowId} has been update with new data.`;
+
+                    return response.json();
+                }).then((data) => {
+                    console.log(`Update Response data : ${JSON.stringify(data)}`);
+                    loadProducts();
+                }).catch((error) => {
+                    console.log('Error while fetching data');
+                });
+            }            
+
+
+        }
+
+    </script>
+
+</head>
+<body>
+    <div class="container">
+    <table class="table table-bordered table-dark">
+        <tr>
+          <td>
+            <table>
+              <tr>
+                <td>Product Id :</td>
+                <td><input type="text" id="productId"/></td>
+              </tr>
+              <tr>
+                <td>Product Name :</td>
+                <td><input type="text" id="productName" /></td>
+              </tr>
+
+              <tr>
+                <td>Product Price :</td>
+  
+                <td><input type="number" id="productPrice"/></td>
+              </tr>
+            
+
+              <tr>
+                <td>Description :</td>
+  
+                <td><input type="text" id="description"/></td>
+              </tr>
+  
+              <tr>
+                  <td>Category : </td>
+                  <td id="categorySelect"></td>
+              </tr>
+
+              <tr >
+                  <td>Manufacturer : </td>
+                  <td id="manufacturerSelect"></td>
+              </tr>
+
+              
+            </table>
+          </td>
+          
+
+          </tr>
+          </table>
+
+
+          <div class="btn-group" role="group">
+                <button class="btn btn-success" onclick="{productSaveClicked()}" >Save Product</button>
+                <button class="btn btn-warning" onclick="{productUpdateClicked()}" id="productUpdate">Update Product</button>
+                <button class="btn btn-danger">Delete</button>
+          </div>
+          
+          </tr>
+ 
+          <br>
+
+          <label id="dataValidationMessage" style="color: red; font-size: 15px;"></label>
+
+          <br>
+          <label id="successMessageLabel" style="color: green; font-size: 20px;"></label>
+
+
+          <br><br>
+
+    </div>
+
+
+        <div class="container">
+
+          <div id="productsTable">
+
+          </div>
+
+        </div>
+
+</body>
+</html>

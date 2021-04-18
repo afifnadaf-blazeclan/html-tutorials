@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products Form</title>
+  <script src="./spead_example.js"></script>
+</head>
+
+<body>
+  <div>
+    <table>
+      <tr>
+
+
+        <td>
+          <table>
+            <tr>
+              <td>Product Id :</td>
+              <td><input type="text" id="productId"/></td>
+            </tr>
+            <tr>
+              <td>Category Id :</td>
+
+              <td><input type="text" id="productCategoryId"/></td>
+            </tr>
+            <tr>
+              <td>Product Name :</td>
+              <td><input type="text" id="productName" /></td>
+            </tr>
+            <tr>
+              <td>Product Price :</td>
+
+              <td><input type="text" id="productPrice"/></td>
+            </tr>
+
+            <tr>
+              <td style="padding: 20px">
+              <input id="productSave" type="button" value="Save Product" onclick="{productSaveClicked()}"/>
+              </td>
+            </tr>
+          </table>
+        </td>
+
+
+
+        <td style="padding-left: 40px;">
+          <table>
+            <tr>
+              <td>Category Id :</td>
+              <td><input type="text" id="categoryId"/></td>
+            </tr>
+            <tr>
+              <td>Category Name :</td>
+              <td><input type="text" id="categoryName"/></td>
+            </tr>
+            <tr>
+              <td style="padding: 20px">
+              <input id="categorySave" type="button" value="Save Category" onclick="{categorySaveClicked()}"/>
+              </td>
+            </tr>
+          </table>
+        </td>
+
+
+      </tr>
+    </table>
+
+
+    <table>
+
+      <tr>
+
+
+        <td style="padding-left: 40px;">
+          <div id="productTable">
+
+          </div>
+
+        </td>
+
+
+        <td>
+          <div id="categoryTable">
+
+          </div>
+
+        </td>
+
+      </tr>
+
+    </table>
+
+
+
+
+  </div>
+</body>
+
+</html>
